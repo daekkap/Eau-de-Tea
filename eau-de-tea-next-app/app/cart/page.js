@@ -28,36 +28,41 @@ export default function CartPage() {
               </thead>
               <tbody>
                 {items.map((item) => (
-                  <tr key={item.id}>
-                    <td data-label="이미지">
-                      <span className='cart-label-mobile'>이미지</span>
-                      <span className='cart-value-mobile'>
-                        <Image src={item.image} alt={item.name} className="cart-item-image" width={80} height={80} />
-                      </span>
+                  <tr key={item.id} className="cart-item-row">
+                    {/* 데스크톱 뷰 */}
+                    <td className="desktop-view"><Image src={item.image} alt={item.name} className="cart-item-image" width={80} height={80} /></td>
+                    <td className="desktop-view">{item.name}</td>
+                    <td className="desktop-view">{item.price.toLocaleString()}원</td>
+                    <td className="desktop-view">
+                        <div className='quantity-controls'>
+                            <button onClick={() => decreaseQuantity(item.id)} className="quantity-btn">-</button>
+                            {item.quantity}
+                            <button onClick={() => addToCart(item)} className="quantity-btn">+</button>
+                        </div>
                     </td>
-                    <td data-label="상품">
-                      <span className="cart-label-mobile">상품</span>
-                      <span className='cart-value-mobile'>{item.name}</span>
-                    </td>
-                    <td data-label="가격">
-                      <span className='cart-label-mobile'>가격</span>
-                      <span className='cart-value-mobile'>{item.price.toLocaleString()}원</span>
-                    </td>
-                    <td data-label="수량">
-                      <span className='cart-label-mobile'>수량</span>
-                      <span className='cart-value-mobile quantity-controles'>
-                        <button onClick={() => decreaseQuantity(item.id)} className="quantity-btn">-</button>
-                        {item.quantity}
-                        <button onClick={() => addToCart(item)} className="quantity-btn">+</button>
-                      </span>
-                    </td>
-                    <td data-label="합계">
-                      <span className='cart-label-mobile'>합계</span>
-                      <span className='cart-value-mobile'>{(item.price * item.quantity).toLocaleString()}원</span>
-                    </td>
-                    <td data-label="관리">
-                      <span className='cart-label-mobile'>관리</span>
-                      <span className='cart-value-mobile'><button onClick={() => removeFromCart(item.id)} className="remove-btn">삭제</button></span>
+                    <td className="desktop-view">{(item.price * item.quantity).toLocaleString()}원</td>
+                    <td className="desktop-view"><button onClick={() => removeFromCart(item.id)} className="remove-btn">삭제</button></td>
+
+                    {/* 모바일 뷰 */}
+                    <td className="mobile-view" colSpan="6">
+                        <div className="mobile-cart-item">
+                            <div className="mobile-cart-image">
+                                <Image src={item.image} alt={item.name} className="cart-item-image" width={60} height={60} />
+                            </div>
+                            <div className="mobile-cart-details">
+                                <p className="mobile-cart-name">{item.name}</p>
+                                <div className="quantity-controls-mobile">
+                                    <button onClick={() => decreaseQuantity(item.id)} className="quantity-btn">-</button>
+                                    <span>{item.quantity}</span>
+                                    <button onClick={() => addToCart(item)} className="quantity-btn">+</button>
+                                </div>
+                                <p className="mobile-cart-price">{(item.price * item.quantity).toLocaleString()}원</p>
+
+                            </div>
+                            <div className="mobile-cart-actions">
+                                <button onClick={() => removeFromCart(item.id)} className="remove-btn">×</button>
+                            </div>
+                        </div>
                     </td>
                   </tr>
                 ))}
