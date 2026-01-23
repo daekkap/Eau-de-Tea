@@ -1,50 +1,64 @@
 'use client';
 
-import { useState } from 'react'; // useEffect 삭제
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
+import { useState } from 'react';
 
 export default function Header() {
   const { items } = useCart();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
 
-  // useEffect와 mounted 삭제 (지금 단계에선 불필요)
+  // reduce를 사용하여 총 수량 계산 (안전장치 추가)
+  const cartCount = Array.isArray(items) ? items.reduce((total, item) => total + item.quantity, 0) : 0;
 
-  // 장바구니 총 수량 계산
-  const cartCount = items.reduce((total, item) => total + item.quantity, 0);
+  const toggleNav = () => {
+    setIsNavOpen(!isNavOpen);
+  };
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+  const closeNav = () => {
+    setIsNavOpen(false);
   };
 
   return (
     <header className="main-header">
       <nav className="main-nav">
-        {/* 모바일 햄버거 버튼 */}
-        <button className="hamburger-btn" onClick={toggleMenu}>
-          &#9776;
-        </button>
-        
+        {/* 1. 로고 (맨 왼쪽) */}
         <div className="logo-container">
-          <Link href="/" className="logo">Eau de Tea</Link>
+          <Link href="/" className="logo" onClick={closeNav}>
+            Eau de Tea
+          </Link>
         </div>
-        
-        {/* 장바구니 버튼 */}
+
+        {/* 2. 모바일용 햄버거 버튼 */}
+        <button className="hamburger-btn" onClick={toggleNav}>
+          ☰
+        </button>
+
+        {/* 3. 메뉴 링크들 (중앙) */}
+        <div className={`nav-links-container ${isNavOpen ? 'nav-open' : ''}`}>
+          <Link href="/" className="nav-item" onClick={closeNav}>
+            HOME
+          </Link>
+          <Link href="/shop" className="nav-item" onClick={closeNav}>
+            SHOP
+          </Link>
+          <Link href="/about" className="nav-item" onClick={closeNav}>
+            ABOUT
+          </Link>
+          <Link href="/faqs" className="nav-item" onClick={closeNav}>
+            FAQS
+          </Link>
+
+          {/* 모바일 화면에서는 장바구니가 메뉴 안에 포함될 수도 있음 (선택 사항) */}
+        </div>
+
+        {/* 4. 장바구니 버튼 (★위치 이동됨: 맨 오른쪽으로★) */}
         <div className="cart-button">
           <Link href="/cart">
-            {/* 복잡한 조건문 없이 바로 출력 */}
             CART ({cartCount})
           </Link>
         </div>
       </nav>
-
-      {/* 모바일 메뉴 드로어 */}
-      <div className={`nav-links-container ${isMenuOpen ? 'nav-open' : ''}`}>
-        <Link href="/" className="nav-item" onClick={() => setIsMenuOpen(false)}>HOME</Link>
-        <Link href="/shop" className="nav-item" onClick={() => setIsMenuOpen(false)}>SHOP</Link>
-        <Link href="/about" className="nav-item" onClick={() => setIsMenuOpen(false)}>ABOUT</Link>
-        <Link href="/faqs" className="nav-item" onClick={() => setIsMenuOpen(false)}>FAQS</Link>
-      </div>
     </header>
   );
 }
