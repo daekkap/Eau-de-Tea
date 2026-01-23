@@ -1,3 +1,5 @@
+import Link from 'next/link'; // 여기서 가져왔으니...
+
 export const metadata = {
   title: 'Eau de Tea | Official Site',
 };
@@ -10,6 +12,14 @@ export default function HomePage() {
           <div className="hero-text">
             <h1>최고의 순간을 위한 한 잔</h1>
             <p>엄선된 찻잎으로 만든 프리미엄 티백을 만나보세요.</p>
+            
+            {/* ...여기서 이렇게 사용해야 경고가 사라집니다! */}
+            <div style={{ marginTop: '30px' }}>
+              <Link href="/shop" className="checkout-btn" style={{ backgroundColor: 'white', color: 'black' }}>
+                SHOP NOW
+              </Link>
+            </div>
+
           </div>
         </div>
       </section>
