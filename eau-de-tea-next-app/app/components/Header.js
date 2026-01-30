@@ -2,14 +2,20 @@
 
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Header() {
-  const { items } = useCart();
+  const { cart } = useCart(); 
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // reduce를 사용하여 총 수량 계산 (안전장치 추가)
-  const cartCount = Array.isArray(items) ? items.reduce((total, item) => total + item.quantity, 0) : 0;
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const cartCount = (cart && Array.isArray(cart)) 
+    ? cart.reduce((total, item) => total + item.quantity, 0) 
+    : 0;
 
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen);
@@ -22,20 +28,35 @@ export default function Header() {
   return (
     <header className="main-header">
       <nav className="main-nav">
-        {/* 1. 로고 (맨 왼쪽) */}
+        
+        {/* 모바일 햄버거 버튼 */}
+        <button className="hamburger-btn" onClick={toggleNav}>
+          ☰
+        </button>
+
+        {/* 로고 */}
         <div className="logo-container">
           <Link href="/" className="logo" onClick={closeNav}>
             Eau de Tea
           </Link>
         </div>
 
-        {/* 2. 모바일용 햄버거 버튼 */}
-        <button className="hamburger-btn" onClick={toggleNav}>
-          ☰
-        </button>
-
-        {/* 3. 메뉴 링크들 (중앙) */}
+        {/* 메뉴 링크들 */}
         <div className={`nav-links-container ${isNavOpen ? 'nav-open' : ''}`}>
+          
+          {/* 모바일 닫기 버튼 */}
+          <button 
+            onClick={closeNav}
+            className="mobile-close-btn"
+            style={{
+              position: 'absolute', top: '30px', right: '30px', 
+              background: 'none', border: 'none', color: 'white', fontSize: '30px', cursor: 'pointer',
+              display: isNavOpen ? 'block' : 'none' 
+            }}
+          >
+            ✕
+          </button>
+
           <Link href="/" className="nav-item" onClick={closeNav}>
             HOME
           </Link>
@@ -45,17 +66,16 @@ export default function Header() {
           <Link href="/about" className="nav-item" onClick={closeNav}>
             ABOUT
           </Link>
+          {/* ★ CHECKOUT을 지우고 FAQS를 복구했습니다! */}
           <Link href="/faqs" className="nav-item" onClick={closeNav}>
             FAQS
           </Link>
-
-          {/* 모바일 화면에서는 장바구니가 메뉴 안에 포함될 수도 있음 (선택 사항) */}
         </div>
 
-        {/* 4. 장바구니 버튼 (★위치 이동됨: 맨 오른쪽으로★) */}
+        {/* 장바구니 버튼 */}
         <div className="cart-button">
           <Link href="/cart">
-            CART ({cartCount})
+            CART ({isMounted ? cartCount : 0})
           </Link>
         </div>
       </nav>
