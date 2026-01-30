@@ -9,7 +9,7 @@
     box-sizing: border-box;
 }
 
-/* 기본 폰트 설정 */
+/* 기본 폰트 및 레이아웃 설정 */
 body {
     font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
@@ -18,16 +18,50 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.6;
+
+    /* ★ Sticky Footer (푸터 하단 고정) 설정 */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* --- ★ [핵심 수정] 링크 및 버튼 터치/클릭 반응 설정 ★ --- */
+a,
+button {
+    /* 1. 모바일 터치 시 생기는 못생긴 회색 박스 제거 */
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
 }
 
 a {
     color: inherit;
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: color 0.2s ease, opacity 0.2s ease;
 }
 
-a:hover {
-    color: #888888;
+/* 2. [추가됨] 누르고 있을 때만 반응 (Sticky Hover 해결) */
+a:active,
+button:active {
+    opacity: 0.6;
+    /* 누를 때 살짝 투명해짐 */
+    color: #888;
+    /* 누를 때 회색으로 변함 */
+}
+
+/* 3. [추가됨] 마우스가 있는 PC에서만 호버 효과 적용 */
+@media (hover: hover) {
+    a:hover {
+        color: #888888;
+    }
+
+    /* 버튼 호버 효과도 여기서 관리 */
+    .add-to-cart-btn:hover,
+    .checkout-btn:hover {
+        background-color: #fff;
+        color: #1a1a1a;
+        opacity: 1;
+        /* 호버 시에는 투명도 유지 */
+    }
 }
 
 /* 제목 & 로고 폰트 설정 */
@@ -127,6 +161,9 @@ h3 {
 main {
     padding: 100px 40px 40px;
     animation: fadeIn 0.6s ease-in-out;
+
+    /* Footer를 하단으로 밀어냄 */
+    flex: 1;
 }
 
 @keyframes fadeIn {
@@ -272,12 +309,7 @@ main {
     transition: all 0.3s ease;
 }
 
-.add-to-cart-btn:hover {
-    background-color: #fff;
-    color: #1a1a1a;
-}
-
-/* --- 장바구니 페이지 --- */
+/* --- 장바구니 페이지 (데스크톱 기본) --- */
 #cart {
     padding: 80px 20px;
     max-width: 1000px;
@@ -363,15 +395,6 @@ main {
     display: inline-block;
 }
 
-.checkout-btn:hover {
-    background-color: #fff;
-    color: #1a1a1a;
-}
-
-.mobile-view {
-    display: none;
-}
-
 /* --- Checkout Page --- */
 #checkout {
     padding: 80px 20px;
@@ -405,7 +428,7 @@ main {
 }
 
 
-/* --- ★ Mobile Responsive Styles (햄버거 마이너스 마진 적용) ★ --- */
+/* --- ★ Mobile Responsive Styles (햄버거/헤더) ★ --- */
 @media (max-width: 768px) {
     .main-header {
         padding: 15px 20px;
@@ -422,19 +445,17 @@ main {
         order: 1;
         margin: 0;
         z-index: 1002;
-
-        /* ★ 핵심 수정: 마이너스 값을 줘서 강제로 위로 당김 */
         margin-top: -8px;
+        /* 위로 살짝 당김 */
     }
 
-    /* 2. 카트 버튼 (오른쪽) - 유지 */
+    /* 2. 카트 버튼 (오른쪽) */
     .cart-button {
         order: 2;
         margin: 0;
         z-index: 1002;
-
-        /* 아까 좋다고 하신 높이 유지 */
         margin-top: 4px;
+        /* 높이 보정 */
     }
 
     .cart-button a {
@@ -443,7 +464,7 @@ main {
         letter-spacing: 1px;
     }
 
-    /* 3. 로고 (화면 정중앙 고정) - 유지 */
+    /* 3. 로고 (화면 정중앙) */
     .logo-container {
         position: absolute;
         left: 50%;
@@ -501,52 +522,359 @@ main {
     .product-card {
         margin-bottom: 60px;
     }
+}
 
+/* --- Product Detail Page (상세 페이지) --- */
+.product-detail-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    max-width: 1200px;
+    margin: 40px auto;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.detail-image-wrapper {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.detail-info-wrapper {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.detail-title {
+    font-size: 42px;
+    font-family: var(--font-playfair), serif;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.detail-price {
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 30px;
+}
+
+.detail-desc {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+.detail-text {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 40px;
+    line-height: 1.8;
+    white-space: pre-line;
+}
+
+.detail-info-wrapper hr {
+    border: 0;
+    height: 1px;
+    background: #ddd;
+    margin: 30px 0;
+}
+
+
+/* --- ★ 상세 페이지 모바일 반응형 ★ --- */
+@media (max-width: 768px) {
+    .product-detail-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        margin-top: 20px;
+    }
+
+    .detail-info-wrapper {
+        text-align: center;
+        padding: 0 10px;
+    }
+
+    .detail-title {
+        font-size: 32px;
+    }
+
+    .detail-price {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .detail-desc {
+        font-size: 18px;
+    }
+
+    .detail-info-wrapper .add-to-cart-btn {
+        width: 100%;
+        max-width: 300px;
+        margin: 30px auto 0;
+    }
+}
+
+
+/* --- ★ 장바구니 페이지 모바일 깨짐 수정 패치 ★ --- */
+@media (max-width: 768px) {
+
+    /* 1. 테이블 헤더 숨김 */
     .cart-table thead {
         display: none !important;
     }
 
-    .cart-table td.mobile-view {
-        padding: 0;
+    /* 2. 각 행(Row)을 카드처럼 디자인 */
+    .cart-table tbody tr {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px solid #e1e1e1;
+        margin-bottom: 20px;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 3. 각 셀(Cell)을 블록으로 펴주기 */
+    .cart-table td {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 10px 0;
         border: none;
     }
 
-    .mobile-cart-item {
-        display: flex;
-        gap: 20px;
-        padding: 20px;
-        border: 1px solid #eee;
-        margin-bottom: 20px;
-        background-color: #fafafa;
+    /* 4. 이미지 크기 조정 */
+    .cart-item-image {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 10px;
     }
 
-    .mobile-cart-details {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        text-align: left;
-    }
-
-    .mobile-cart-name {
-        font-weight: bold;
-        font-size: 1.1rem;
-    }
-
-    .quantity-controls-mobile {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
+    /* 5. 결제 요약 영역 정리 */
     .cart-summary {
         flex-direction: column;
         width: 100%;
         gap: 20px;
+        align-items: stretch;
     }
 
-    #cart .checkout-btn {
+    .checkout-btn {
         width: 100%;
         text-align: center;
+    }
+}
+
+/* --- ★ Checkout(결제) 페이지 모바일 깨짐 방지 ★ --- */
+@media (max-width: 768px) {
+    .checkout-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .checkout-form {
+        padding: 20px;
+    }
+}
+
+/* --- ★ 메인 페이지 'SHOP NOW' 버튼 모바일 전용 사이즈 수정 ★ --- */
+@media (max-width: 768px) {
+    .hero-shop-btn {
+        width: auto !important;
+        display: inline-block !important;
+        padding: 12px 35px !important;
+        font-size: 14px !important;
+        min-width: 150px !important;
+        margin-top: 20px !important;
+    }
+}
+
+
+/* --- ★ Footer Design (푸터 스타일) ★ --- */
+.site-footer {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 60px 20px 20px;
+    margin-top: 60px;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-section h3.footer-logo {
+    font-family: var(--font-playfair), serif;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.footer-section h4 {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    color: #888;
+}
+
+.footer-section p {
+    color: #ccc;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 10px;
+}
+
+.footer-section ul li a {
+    color: #ccc;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.footer-section ul li a:hover {
+    color: #fff;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    font-size: 12px;
+    color: #555;
+}
+
+/* --- 푸터 모바일 반응형 --- */
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+    }
+}
+
+/* --- ★ Reviews System Styles (리뷰 섹션) ★ --- */
+.reviews-section {
+    max-width: 800px;
+    margin: 0 auto; /* 가운데 정렬 */
+    padding: 0 20px;
+}
+
+.reviews-section h3 {
+    font-size: 24px;
+    margin-bottom: 30px;
+    font-family: var(--font-playfair), serif;
+    text-align: center;
+}
+
+/* 리뷰 입력 폼 */
+.review-form {
+    background-color: #f9f9f9;
+    padding: 30px;
+    margin-bottom: 50px;
+    border: 1px solid #eee;
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.review-input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.name-input {
+    flex: 2; /* 이름 칸 너비 */
+}
+
+.rating-select {
+    flex: 1; /* 별점 칸 너비 */
+}
+
+.text-input {
+    width: 100%;
+    height: 100px;
+    resize: none; /* 크기 조절 방지 */
+    margin-bottom: 15px;
+}
+
+.submit-review-btn {
+    background-color: #1a1a1a;
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    font-weight: 600;
+    cursor: pointer;
+    float: right; /* 오른쪽 정렬 */
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.review-form::after {
+    content: "";
+    display: block;
+    clear: both; /* float 해제 */
+}
+
+/* 리뷰 리스트 아이템 */
+.review-item {
+    border-bottom: 1px solid #eee;
+    padding: 25px 0;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.review-stars {
+    color: #ffd700; /* 금색 별 */
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+.review-meta {
+    font-size: 13px;
+    color: #888;
+}
+
+.review-text {
+    font-size: 15px;
+    color: #444;
+    line-height: 1.6;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column; /* 입력창 세로로 쌓기 */
     }
 }

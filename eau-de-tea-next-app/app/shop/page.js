@@ -1,33 +1,53 @@
-'use client'; // onClick 등 사용자 상호작용이 있으므로 클라이언트 컴포넌트로 지정
+'use client';
 
 import Image from 'next/image';
-import { useCart } from '../context/CartContext'; // useCart 훅을 임포트
+import Link from 'next/link';
+import { useCart } from '../context/CartContext';
+import { products } from '../data/products';
 
 export default function ShopPage() {
-  // useCart 훅을 호출하여 addToCart 함수를 가져옴
   const { addToCart } = useCart();
-
-  // 상품 데이터에 price 추가
-  const products = [
-    { id: 1, name: '얼그레이 클래식', description: '베르가못 향이 감도는 클래식한 홍차', image: '/images/tea-bag1.jpg', price: 12000 },
-    { id: 2, name: '캐모마일 가든', description: '편안한 밤을 위한 부드러운 허브티', image: '/images/tea-bag2.jpg', price: 15000 },
-  ];
 
   return (
     <main>
-      <section id="shop">
+      <section id="shop" className="content-section">
         <h2>Our Products</h2>
         <div className="product-grid">
           {products.map((product) => (
             <div className="product-card" key={product.id}>
-              <div className="product-image-placeholder">
-                {/* width와 height 속성 다시 추가 */}
-                <Image src={product.image} alt={product.name} className="product-image" fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-              </div>
-              <h3>{product.name}</h3>
+
+
+              <Link
+                href={`/shop/${product.id}`}
+                className="product-image-placeholder"
+                style={{ display: 'block', position: 'relative', width: '100%', aspectRatio: '1 / 1' }}
+              >
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  className="product-image"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </Link>
+
+              {/* 이름도 클릭하기 좋게 블록으로 변경 */}
+              <Link
+                href={`/shop/${product.id}`}
+                style={{ display: 'inline-block', textDecoration: 'none', color: 'inherit' }}
+              >
+                <h3>{product.name}</h3>
+              </Link>
+
               <p>{product.description}</p>
-              {/* 가격 정보를 포함한 product 객체를 전달합니다. */}
-              <button className="add-to-cart-btn" onClick={() => addToCart(product)}>
+              <p>₩ {product.price.toLocaleString()}</p>
+
+              {/* 장바구니 버튼은 클릭 시 상세페이지 이동을 막아야 함 (stopPropagation) */}
+              <button className="add-to-cart-btn" onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation(); // 혹시 모를 버블링 방지
+                addToCart(product);
+              }}>
                 Add to Cart
               </button>
             </div>

@@ -10,12 +10,13 @@ export default function HomePage() {
       <section id="home">
         <div className="hero-background">
           <div className="hero-text">
+            <h1>Eau de Tea</h1>
             <h1>최고의 순간을 위한 한 잔</h1>
             <p>엄선된 찻잎으로 만든 프리미엄 티백을 만나보세요.</p>
             
             {/* ...여기서 이렇게 사용해야 경고가 사라집니다! */}
             <div style={{ marginTop: '30px' }}>
-              <Link href="/shop" className="checkout-btn" style={{ backgroundColor: 'white', color: 'black' }}>
+              <Link href="/shop" className="checkout-btn hero-shop-btn" style={{ backgroundColor: 'white', color: 'black' }}>
                 SHOP NOW
               </Link>
             </div>

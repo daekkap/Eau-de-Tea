@@ -5,96 +5,76 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  // ★ 중요: 괄호 ( ) 안에 빈 배열 []을 넣고, 그 앞에 타입을 적어야 합니다.
-  const [items, setItems] = useState(/** @type {any[]} */ ([]));
-  
-  const [isInitialized, setIsInitialized] = useState(false);
+  // 초기값을 빈 배열로 설정
+  const [items, setItems] = useState([]);
 
-  // 1. [불러오기]
+  // (선택사항) 로컬 스토리지에서 장바구니 불러오기
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedCart = localStorage.getItem('cartItems');
-      if (savedCart) {
-        try {
-          const parsedCart = JSON.parse(savedCart);
-          if (Array.isArray(parsedCart)) {
-            setItems(parsedCart);
-          } else {
-            console.warn("장바구니 데이터 오류: 배열이 아님");
-            setItems([]);
-          }
-        } catch (error) {
-          console.error("장바구니 파싱 실패:", error);
-          setItems([]);
-        }
-      }
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      setItems(JSON.parse(savedCart));
     }
-    setIsInitialized(true);
   }, []);
 
-  // 2. [저장하기]
+  // 장바구니가 변경될 때마다 로컬 스토리지에 저장
   useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('cartItems', JSON.stringify(items));
-    }
-  }, [items, isInitialized]);
+    localStorage.setItem('cart', JSON.stringify(items));
+  }, [items]);
 
+  // 1. 장바구니 담기
   const addToCart = (product) => {
-    setItems(prevItems => {
-      // items가 혹시라도 배열이 아닐 경우를 대비한 방어 코드
-      const currentItems = Array.isArray(prevItems) ? prevItems : [];
-      
-      const existingItem = currentItems.find(item => item.id === product.id);
+    setItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === product.id);
       if (existingItem) {
-        return currentItems.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        // 이미 있으면 수량만 +1
+        return prevItems.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
       }
-      return [...currentItems, { ...product, quantity: 1 }];
+      // 없으면 새로 추가 (quantity: 1)
+      return [...prevItems, { ...product, quantity: 1 }];
     });
+
+    // (선택사항) 알림
+    // alert(`${product.name}이(가) 장바구니에 담겼습니다.`);
   };
 
-  const removeFromCart = (productId) => {
-    setItems(prevItems => {
-      const currentItems = Array.isArray(prevItems) ? prevItems : [];
-      return currentItems.filter(item => item.id !== productId);
-    });
+  // 2. 장바구니에서 삭제
+  const removeFromCart = (id) => {
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
-  const decreaseQuantity = (productId) => {
-    setItems(prevItems => {
-      const currentItems = Array.isArray(prevItems) ? prevItems : [];
-      const existingItem = currentItems.find(item => item.id === productId);
-      
-      if (!existingItem) return currentItems; // 없는 상품이면 그대로 리턴
+  // 3. 수량 조절 (★ 이 부분이 빠져있어서 에러가 났던 겁니다!)
+  const updateQuantity = (id, newQuantity) => {
+    if (newQuantity < 1) return; // 수량은 1보다 작을 수 없음
 
-      if (existingItem.quantity === 1) {
-        return currentItems.filter(item => item.id !== productId);
-      }
-      return currentItems.map(item =>
-        item.id === productId ? { ...item, quantity: item.quantity - 1 } : item
-      );
-    });
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      )
+    );
   };
 
+  // 4. 장바구니 비우기 (결제 완료 후 사용)
   const clearCart = () => {
     setItems([]);
   };
 
-  const totalPrice = Array.isArray(items) ? items.reduce((total, item) => {
-    return total + (item.price || 0) * item.quantity;
-  }, 0) : 0;
-
-  const value = {
-    items,
-    addToCart,
-    removeFromCart,
-    decreaseQuantity,
-    totalPrice,
-    clearCart,
-  };
-
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider
+      value={{
+        items,
+        addToCart,
+        removeFromCart,
+        updateQuantity, // ★ Provider에 꼭 넣어줘야 다른 파일에서 쓸 수 있음
+        clearCart
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 }
 
 export function useCart() {
